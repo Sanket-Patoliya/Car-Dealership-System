@@ -102,3 +102,71 @@ describe('POST /api/vehicles', () => {
     expect(vehicleCount).toBe(0);
   });
 });
+
+describe('GET /api/vehicles', () => {
+  it('should return all vehicles', async () => {
+    await Vehicle.create([
+      {
+        brand: 'Toyota',
+        model: 'Camry',
+        category: 'Sedan',
+        price: 28999,
+        quantity: 5,
+      },
+      {
+        brand: 'Tesla',
+        model: 'Model 3',
+        category: 'Electric',
+        price: 42990,
+        quantity: 12,
+      },
+      {
+        brand: 'BMW',
+        model: 'X5',
+        category: 'SUV',
+        price: 65900,
+        quantity: 3,
+      },
+    ]);
+
+    const res = await request(app).get('/api/vehicles');
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty('status', 'success');
+    expect(res.body.data).toHaveProperty('vehicles');
+    expect(Array.isArray(res.body.data.vehicles)).toBe(true);
+    expect(res.body.data.vehicles).toHaveLength(3);
+  });
+
+  it('should return an empty array when no vehicles exist', async () => {
+    const res = await request(app).get('/api/vehicles');
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty('status', 'success');
+    expect(res.body.data).toHaveProperty('vehicles');
+    expect(res.body.data.vehicles).toEqual([]);
+  });
+
+  it('should return vehicles with correct fields', async () => {
+    const vehicle = await Vehicle.create({
+      brand: 'Mercedes-Benz',
+      model: 'C-Class',
+      category: 'Luxury',
+      price: 55900,
+      quantity: 7,
+    });
+
+    const res = await request(app).get('/api/vehicles');
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data.vehicles).toHaveLength(1);
+
+    const returnedVehicle = res.body.data.vehicles[0];
+    expect(returnedVehicle).toHaveProperty('id', vehicle._id.toString());
+    expect(returnedVehicle).toHaveProperty('brand', 'Mercedes-Benz');
+    expect(returnedVehicle).toHaveProperty('model', 'C-Class');
+    expect(returnedVehicle).toHaveProperty('category', 'Luxury');
+    expect(returnedVehicle).toHaveProperty('price', 55900);
+    expect(returnedVehicle).toHaveProperty('quantity', 7);
+  });
+});
