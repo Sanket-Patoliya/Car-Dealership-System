@@ -9,12 +9,29 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Fetch all vehicles from the database on component mount
-  const fetchVehicles = async () => {
+  // Search & Filter State
+  const [make, setMake] = useState('');
+  const [model, setModel] = useState('');
+  const [category, setCategory] = useState('All');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+
+  // Fetch vehicles with optional active filters
+  const fetchVehicles = async (filters = {}) => {
     setLoading(true);
     setError('');
     try {
-      const res = await api.get('/vehicles');
+      const params = {};
+      if (filters.make) params.make = filters.make;
+      if (filters.model) params.model = filters.model;
+      if (filters.category && filters.category !== 'All') params.category = filters.category;
+      if (filters.minPrice) params.minPrice = filters.minPrice;
+      if (filters.maxPrice) params.maxPrice = filters.maxPrice;
+
+      const hasFilters = Object.keys(params).length > 0;
+      const url = hasFilters ? '/vehicles/search' : '/vehicles';
+
+      const res = await api.get(url, { params });
       if (res.data.status === 'success') {
         setVehicles(res.data.data.vehicles || []);
       }
@@ -26,8 +43,22 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    fetchVehicles();
+    fetchVehicles({});
   }, []);
+
+  const handleApplyFilters = (e) => {
+    if (e) e.preventDefault();
+    fetchVehicles({ make, model, category, minPrice, maxPrice });
+  };
+
+  const handleClearFilters = () => {
+    setMake('');
+    setModel('');
+    setCategory('All');
+    setMinPrice('');
+    setMaxPrice('');
+    fetchVehicles({});
+  };
 
   const handlePurchaseSuccess = (updatedVehicle) => {
     setVehicles((prev) =>
@@ -49,9 +80,13 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white font-sans">
+    <div className="min-h-screen bg-slate-950 text-white font-sans relative overflow-hidden">
+      {/* Dynamic Background Glowing Circles */}
+      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-teal-500/5 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-3xl animate-pulse delay-700"></div>
+
       {/* Premium Header */}
-      <header className="border-b border-slate-900 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40">
+      <header className="border-b border-slate-900 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <span className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-teal-400 to-indigo-500 bg-clip-text text-transparent">
@@ -75,23 +110,112 @@ const Dashboard = () => {
         </div>
       </header>
 
-      {/* Main Body content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      {/* Main Body Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
         {/* Dashboard Title & Meta */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
-          <div>
-            <h2 className="text-3xl font-extrabold tracking-tight">Active Inventory</h2>
-            <p className="text-slate-400 mt-1">Explore and manage high-performance vehicles.</p>
-          </div>
+        <div className="mb-8">
+          <h2 className="text-3xl font-extrabold tracking-tight">Active Inventory</h2>
+          <p className="text-slate-400 mt-1">Explore and manage high-performance vehicles.</p>
         </div>
+
+        {/* Filter and Search Bar */}
+        <form onSubmit={handleApplyFilters} className="bg-slate-900/30 backdrop-blur-md border border-slate-900 rounded-3xl p-6 mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+          <div>
+            <label htmlFor="make-filter" className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+              Make
+            </label>
+            <input
+              id="make-filter"
+              type="text"
+              className="w-full bg-slate-950/60 border border-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 rounded-xl px-4 py-2.5 text-white placeholder-slate-600 outline-none text-sm transition-all duration-300"
+              placeholder="Toyota"
+              value={make}
+              onChange={(e) => setMake(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="model-filter" className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+              Model
+            </label>
+            <input
+              id="model-filter"
+              type="text"
+              className="w-full bg-slate-950/60 border border-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 rounded-xl px-4 py-2.5 text-white placeholder-slate-600 outline-none text-sm transition-all duration-300"
+              placeholder="Camry"
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="category-filter" className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+              Category
+            </label>
+            <select
+              id="category-filter"
+              className="w-full bg-slate-950/60 border border-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 rounded-xl px-4 py-2.5 text-white outline-none text-sm transition-all duration-300"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              <option value="All">All Categories</option>
+              <option value="Sedan">Sedan</option>
+              <option value="SUV">SUV</option>
+              <option value="Hatchback">Hatchback</option>
+              <option value="Luxury">Luxury</option>
+              <option value="Electric">Electric</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+              Price Range ($)
+            </label>
+            <div className="flex items-center space-x-2">
+              <input
+                type="number"
+                aria-label="Minimum Price"
+                className="w-1/2 bg-slate-950/60 border border-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 rounded-xl px-3 py-2.5 text-white placeholder-slate-600 outline-none text-sm transition-all duration-300"
+                placeholder="Min"
+                value={minPrice}
+                onChange={(e) => setMinPrice(e.target.value)}
+              />
+              <span className="text-slate-600">-</span>
+              <input
+                type="number"
+                aria-label="Maximum Price"
+                className="w-1/2 bg-slate-950/60 border border-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 rounded-xl px-3 py-2.5 text-white placeholder-slate-600 outline-none text-sm transition-all duration-300"
+                placeholder="Max"
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="flex space-x-2">
+            <button
+              type="submit"
+              className="flex-1 bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-400 hover:to-indigo-500 text-white font-semibold py-2.5 px-4 rounded-xl text-sm transition-all duration-300 shadow-md shadow-teal-500/10"
+            >
+              Apply
+            </button>
+            <button
+              type="button"
+              onClick={handleClearFilters}
+              className="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-3 rounded-xl text-sm transition-all duration-300 border border-slate-700"
+            >
+              Reset
+            </button>
+          </div>
+        </form>
 
         {/* Dynamic States */}
         {error && (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-6 text-red-400 mb-8 max-w-lg">
+          <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-6 text-red-400 mb-8 max-w-lg shadow-xl">
             <h4 className="font-bold mb-1">Error Loading Inventory</h4>
             <p className="text-sm">{error}</p>
             <button
-              onClick={fetchVehicles}
+              onClick={handleApplyFilters}
               className="mt-4 bg-red-500/20 hover:bg-red-500/30 text-red-400 font-semibold py-1.5 px-4 rounded-xl text-xs transition-all duration-300"
             >
               Retry
@@ -134,8 +258,8 @@ const Dashboard = () => {
               />
             </svg>
             <h3 className="text-xl font-bold text-white mb-2">No Vehicles Found</h3>
-            <p className="text-slate-400 text-sm mb-6">
-              The dealership inventory is currently empty.
+            <p className="text-slate-400 text-sm">
+              Try adjusting your search criteria or clearing active filters.
             </p>
           </div>
         ) : (
