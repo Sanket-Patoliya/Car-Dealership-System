@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import VehicleCard from '../components/VehicleCard';
+import VehicleModal from '../components/VehicleModal';
 import api from '../api/axios';
 
 const Dashboard = () => {
@@ -15,6 +16,11 @@ const Dashboard = () => {
   const [category, setCategory] = useState('All');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
+
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState('add'); // 'add', 'edit', 'restock'
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
 
   // Fetch vehicles with optional active filters
   const fetchVehicles = async (filters = {}) => {
@@ -66,17 +72,60 @@ const Dashboard = () => {
     );
   };
 
-  // Mock admin callbacks for now
+  // Admin Actions
   const handleEdit = (vehicle) => {
-    console.log('Edit clicked for:', vehicle);
+    setSelectedVehicle(vehicle);
+    setModalMode('edit');
+    setIsModalOpen(true);
   };
 
   const handleRestock = (vehicle) => {
-    console.log('Restock clicked for:', vehicle);
+    setSelectedVehicle(vehicle);
+    setModalMode('restock');
+    setIsModalOpen(true);
   };
 
   const handleDelete = async (id) => {
-    console.log('Delete clicked for ID:', id);
+    if (!window.confirm('Are you sure you want to delete this vehicle from inventory?')) return;
+    try {
+      const res = await api.delete(`/vehicles/${id}`);
+      if (res.data.status === 'success') {
+        setVehicles((prev) => prev.filter((v) => v.id !== id));
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Delete operation failed');
+    }
+  };
+
+  const handleModalSubmit = async (formData) => {
+    try {
+      if (modalMode === 'add') {
+        const res = await api.post('/vehicles', formData);
+        if (res.data.status === 'success') {
+          setVehicles((prev) => [res.data.data.vehicle, ...prev]);
+        }
+      } else if (modalMode === 'edit') {
+        const res = await api.put(`/vehicles/${selectedVehicle.id}`, formData);
+        if (res.data.status === 'success') {
+          setVehicles((prev) =>
+            prev.map((v) => (v.id === selectedVehicle.id ? res.data.data.vehicle : v))
+          );
+        }
+      } else if (modalMode === 'restock') {
+        const res = await api.post(`/vehicles/${selectedVehicle.id}/restock`, {
+          quantity: formData.quantity,
+        });
+        if (res.data.status === 'success') {
+          setVehicles((prev) =>
+            prev.map((v) => (v.id === selectedVehicle.id ? res.data.data.vehicle : v))
+          );
+        }
+      }
+      setIsModalOpen(false);
+      setSelectedVehicle(null);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Operation failed');
+    }
   };
 
   return (
@@ -112,10 +161,24 @@ const Dashboard = () => {
 
       {/* Main Body Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
-        {/* Dashboard Title & Meta */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-extrabold tracking-tight">Active Inventory</h2>
-          <p className="text-slate-400 mt-1">Explore and manage high-performance vehicles.</p>
+        {/* Dashboard Title & Meta / Admin Add Vehicle */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+          <div>
+            <h2 className="text-3xl font-extrabold tracking-tight">Active Inventory</h2>
+            <p className="text-slate-400 mt-1">Explore and manage high-performance vehicles.</p>
+          </div>
+          {user?.role === 'admin' && (
+            <button
+              onClick={() => {
+                setSelectedVehicle(null);
+                setModalMode('add');
+                setIsModalOpen(true);
+              }}
+              className="bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-400 hover:to-indigo-500 text-white font-semibold py-2.5 px-6 rounded-xl text-sm transition-all duration-300 shadow-md shadow-teal-500/10"
+            >
+              Add Vehicle
+            </button>
+          )}
         </div>
 
         {/* Filter and Search Bar */}
@@ -278,6 +341,18 @@ const Dashboard = () => {
           </div>
         )}
       </main>
+
+      {/* Admin Modification Modals */}
+      <VehicleModal
+        isOpen={isModalOpen}
+        mode={modalMode}
+        vehicle={selectedVehicle}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedVehicle(null);
+        }}
+        onSubmit={handleModalSubmit}
+      />
     </div>
   );
 };
