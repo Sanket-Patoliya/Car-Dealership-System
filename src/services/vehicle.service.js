@@ -44,3 +44,12 @@ export const createVehicle = async (vehicleData) => {
 
   return formatVehicle(vehicle);
 };
+
+/**
+ * Fetch all vehicles from the inventory.
+ * @returns {Promise<Object[]>} Formatted vehicles for API response
+ */
+export const getAllVehicles = async () => {
+  const vehicles = await Vehicle.find();
+  return vehicles.map(formatVehicle);
+};
