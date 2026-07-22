@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Vehicle from '../models/vehicle.model.js';
 
 const REQUIRED_FIELDS = ['brand', 'model', 'category', 'price', 'quantity'];
@@ -98,3 +99,39 @@ export const searchVehicles = async (filters) => {
 
   return vehicles.map(formatVehicle);
 };
+
+/**
+ * Update an existing vehicle in the inventory.
+ * @param {string} id
+ * @param {Object} vehicleData
+ * @returns {Promise<Object>} Formatted updated vehicle for API response
+ */
+export const updateVehicle = async (id, vehicleData) => {
+  // 1. Validate ObjectId format
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    const error = new Error('Invalid vehicle ID format');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  // 2. Validate required fields
+  const { brand, model, category, price, quantity } = vehicleData;
+  validateVehicleInput({ brand, model, category, price, quantity });
+
+  // 3. Find and update the vehicle with validations active
+  const vehicle = await Vehicle.findByIdAndUpdate(
+    id,
+    { brand, model, category, price, quantity },
+    { new: true, runValidators: true }
+  );
+
+  // 4. Reject if not found
+  if (!vehicle) {
+    const error = new Error('Vehicle not found');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  return formatVehicle(vehicle);
+};
+
