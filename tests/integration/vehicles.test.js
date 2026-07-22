@@ -484,3 +484,86 @@ describe('DELETE /api/vehicles/:id', () => {
   });
 });
 
+describe('POST /api/vehicles/:id/purchase', () => {
+  const existingVehicle = {
+    brand: 'Toyota',
+    model: 'Camry',
+    category: 'Sedan',
+    price: 28999,
+    quantity: 5,
+  };
+
+  let userToken;
+  let vehicle;
+
+  beforeEach(async () => {
+    const regularUser = await User.create({
+      name: 'Regular User',
+      email: 'user@example.com',
+      password: 'password123',
+      role: 'user',
+    });
+
+    userToken = generateToken(regularUser._id);
+    vehicle = await Vehicle.create(existingVehicle);
+  });
+
+  it('should purchase a vehicle successfully and decrease the quantity', async () => {
+    const res = await request(app)
+      .post(`/api/vehicles/${vehicle._id}/purchase`)
+      .set('Authorization', `Bearer ${userToken}`);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty('status', 'success');
+    expect(res.body.data).toHaveProperty('vehicle');
+
+    const updatedVehicle = res.body.data.vehicle;
+    expect(updatedVehicle).toHaveProperty('quantity', existingVehicle.quantity - 1);
+
+    const vehicleInDb = await Vehicle.findById(vehicle._id);
+    expect(vehicleInDb.quantity).toBe(existingVehicle.quantity - 1);
+  });
+
+  it('should reject purchase when the vehicle is out of stock', async () => {
+    // Set quantity to 0
+    await Vehicle.findByIdAndUpdate(vehicle._id, { quantity: 0 });
+
+    const res = await request(app)
+      .post(`/api/vehicles/${vehicle._id}/purchase`)
+      .set('Authorization', `Bearer ${userToken}`);
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toHaveProperty('status', 'fail');
+    expect(res.body.message).toMatch(/out of stock|unavailable|no inventory/i);
+
+    const vehicleInDb = await Vehicle.findById(vehicle._id);
+    expect(vehicleInDb.quantity).toBe(0);
+  });
+
+  it('should reject invalid vehicle IDs', async () => {
+    const invalidIdCases = [
+      {
+        id: 'invalid-id-format',
+        expectedStatus: 400,
+        messagePattern: /invalid|id/i,
+      },
+      {
+        id: new mongoose.Types.ObjectId(),
+        expectedStatus: 404,
+        messagePattern: /not found|exist/i,
+      },
+    ];
+
+    for (const { id, expectedStatus, messagePattern } of invalidIdCases) {
+      const res = await request(app)
+        .post(`/api/vehicles/${id}/purchase`)
+        .set('Authorization', `Bearer ${userToken}`);
+
+      expect(res.statusCode).toBe(expectedStatus);
+      expect(res.body).toHaveProperty('status', 'fail');
+      expect(res.body.message).toMatch(messagePattern);
+    }
+  });
+});
+
+
