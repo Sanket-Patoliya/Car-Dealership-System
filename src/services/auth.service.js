@@ -1,4 +1,6 @@
 import User from '../models/user.model.js';
+import jwt from 'jsonwebtoken';
+
 
 /**
  * Register a new user in the database.
@@ -33,3 +35,45 @@ export const registerUser = async ({ name, email, password }) => {
 
   return newUser;
 };
+
+/**
+ * Log in a user and return the user and a JWT token.
+ * @param {Object} credentials
+ * @param {string} credentials.email
+ * @param {string} credentials.password
+ * @returns {Promise<Object>} Object containing user and token
+ */
+export const loginUser = async ({ email, password }) => {
+  // 1. Validate required fields
+  if (!email || !password) {
+    const error = new Error('Email and password are required');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  // 2. Find user by email
+  const user = await User.findOne({ email });
+  if (!user) {
+    const error = new Error('Invalid email or password');
+    error.statusCode = 401;
+    throw error;
+  }
+
+  // 3. Verify password
+  const isMatch = await user.comparePassword(password);
+  if (!isMatch) {
+    const error = new Error('Invalid email or password');
+    error.statusCode = 401;
+    throw error;
+  }
+
+  // 4. Generate JWT
+  const token = jwt.sign(
+    { id: user._id },
+    process.env.JWT_SECRET || 'fallback-secret',
+    { expiresIn: '1d' }
+  );
+
+  return { user, token };
+};
+
