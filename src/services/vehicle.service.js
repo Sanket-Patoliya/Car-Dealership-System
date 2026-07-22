@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import { validateObjectId } from '../utils/validation.js';
 import Vehicle from '../models/vehicle.model.js';
 
 const REQUIRED_FIELDS = ['brand', 'model', 'category', 'price', 'quantity'];
@@ -108,11 +108,7 @@ export const searchVehicles = async (filters) => {
  */
 export const updateVehicle = async (id, vehicleData) => {
   // 1. Validate ObjectId format
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    const error = new Error('Invalid vehicle ID format');
-    error.statusCode = 400;
-    throw error;
-  }
+  validateObjectId(id, 'vehicle ID');
 
   // 2. Validate required fields
   const { brand, model, category, price, quantity } = vehicleData;
