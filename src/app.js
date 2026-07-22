@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import authRouter from './routes/auth.routes.js';
+import { errorHandler } from './middleware/error.middleware.js';
 
 const app = express();
 
@@ -31,5 +32,8 @@ app.use('*', (req, res) => {
     message: `Can't find ${req.originalUrl} on this server`,
   });
 });
+
+// Global Error Handler
+app.use(errorHandler);
 
 export default app;
