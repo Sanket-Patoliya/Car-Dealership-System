@@ -1,4 +1,4 @@
-import { createVehicle, getAllVehicles, searchVehicles, updateVehicle } from '../services/vehicle.service.js';
+import { createVehicle, getAllVehicles, searchVehicles, updateVehicle, deleteVehicle } from '../services/vehicle.service.js';
 import { catchAsync } from '../utils/catchAsync.js';
 
 export const create = catchAsync(async (req, res) => {
@@ -37,4 +37,14 @@ export const update = catchAsync(async (req, res) => {
     data: { vehicle },
   });
 });
+
+export const remove = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  await deleteVehicle(id);
+
+  return res.status(200).json({
+    status: 'success',
+  });
+});
+
 

@@ -131,3 +131,24 @@ export const updateVehicle = async (id, vehicleData) => {
   return formatVehicle(vehicle);
 };
 
+/**
+ * Delete an existing vehicle from the inventory.
+ * @param {string} id
+ * @returns {Promise<void>}
+ */
+export const deleteVehicle = async (id) => {
+  // 1. Validate ObjectId format
+  validateObjectId(id, 'vehicle ID');
+
+  // 2. Find and delete the vehicle
+  const vehicle = await Vehicle.findByIdAndDelete(id);
+
+  // 3. Reject if not found
+  if (!vehicle) {
+    const error = new Error('Vehicle not found');
+    error.statusCode = 404;
+    throw error;
+  }
+};
+
+
