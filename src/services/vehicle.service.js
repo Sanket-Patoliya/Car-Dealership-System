@@ -54,24 +54,47 @@ export const getAllVehicles = async () => {
   return vehicles.map(formatVehicle);
 };
 
+const SEARCH_FILTER_MAP = {
+  make: 'brand',
+  model: 'model',
+  category: 'category',
+};
+
+const buildPriceRangeFilter = (minPrice, maxPrice) => {
+  if (minPrice === undefined && maxPrice === undefined) {
+    return undefined;
+  }
+
+  const priceFilter = {};
+  if (minPrice !== undefined) priceFilter.$gte = Number(minPrice);
+  if (maxPrice !== undefined) priceFilter.$lte = Number(maxPrice);
+
+  return priceFilter;
+};
+
+const buildVehicleSearchFilter = ({ make, model, category, minPrice, maxPrice }) => {
+  const filter = {};
+
+  if (make) filter[SEARCH_FILTER_MAP.make] = make;
+  if (model) filter[SEARCH_FILTER_MAP.model] = model;
+  if (category) filter[SEARCH_FILTER_MAP.category] = category;
+
+  const priceFilter = buildPriceRangeFilter(minPrice, maxPrice);
+  if (priceFilter) {
+    filter.price = priceFilter;
+  }
+
+  return filter;
+};
+
 /**
  * Search vehicles using optional filters.
  * @param {Object} filters
  * @returns {Promise<Object[]>} Formatted matching vehicles for API response
  */
-export const searchVehicles = async ({ make, model, category, minPrice, maxPrice }) => {
-  const filter = {};
+export const searchVehicles = async (filters) => {
+  const query = buildVehicleSearchFilter(filters);
+  const vehicles = await Vehicle.find(query);
 
-  if (make) filter.brand = make;
-  if (model) filter.model = model;
-  if (category) filter.category = category;
-
-  if (minPrice !== undefined || maxPrice !== undefined) {
-    filter.price = {};
-    if (minPrice !== undefined) filter.price.$gte = Number(minPrice);
-    if (maxPrice !== undefined) filter.price.$lte = Number(maxPrice);
-  }
-
-  const vehicles = await Vehicle.find(filter);
   return vehicles.map(formatVehicle);
 };
