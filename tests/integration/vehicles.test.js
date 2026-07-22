@@ -566,4 +566,117 @@ describe('POST /api/vehicles/:id/purchase', () => {
   });
 });
 
+describe('POST /api/vehicles/:id/restock', () => {
+  const existingVehicle = {
+    brand: 'Toyota',
+    model: 'Camry',
+    category: 'Sedan',
+    price: 28999,
+    quantity: 5,
+  };
+
+  let adminToken;
+  let userToken;
+  let vehicle;
+
+  beforeEach(async () => {
+    const adminUser = await User.create({
+      name: 'Admin User',
+      email: 'admin@example.com',
+      password: 'password123',
+      role: 'admin',
+    });
+
+    const regularUser = await User.create({
+      name: 'Regular User',
+      email: 'user@example.com',
+      password: 'password123',
+      role: 'user',
+    });
+
+    adminToken = generateToken(adminUser._id);
+    userToken = generateToken(regularUser._id);
+    vehicle = await Vehicle.create(existingVehicle);
+  });
+
+  it('should allow an admin to restock a vehicle and increase the quantity', async () => {
+    const restockQty = 10;
+    const res = await request(app)
+      .post(`/api/vehicles/${vehicle._id}/restock`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ quantity: restockQty });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty('status', 'success');
+    expect(res.body.data).toHaveProperty('vehicle');
+
+    const updatedVehicle = res.body.data.vehicle;
+    expect(updatedVehicle).toHaveProperty('quantity', existingVehicle.quantity + restockQty);
+
+    const vehicleInDb = await Vehicle.findById(vehicle._id);
+    expect(vehicleInDb.quantity).toBe(existingVehicle.quantity + restockQty);
+  });
+
+  it('should reject restock requests by normal users', async () => {
+    const res = await request(app)
+      .post(`/api/vehicles/${vehicle._id}/restock`)
+      .set('Authorization', `Bearer ${userToken}`)
+      .send({ quantity: 10 });
+
+    expect(res.statusCode).toBe(403);
+    expect(res.body).toHaveProperty('status', 'fail');
+    expect(res.body.message).toMatch(/permission|authorized|forbidden/i);
+
+    const vehicleInDb = await Vehicle.findById(vehicle._id);
+    expect(vehicleInDb.quantity).toBe(existingVehicle.quantity);
+  });
+
+  it('should reject invalid vehicle IDs', async () => {
+    const invalidIdCases = [
+      {
+        id: 'invalid-id-format',
+        expectedStatus: 400,
+        messagePattern: /invalid|id/i,
+      },
+      {
+        id: new mongoose.Types.ObjectId(),
+        expectedStatus: 404,
+        messagePattern: /not found|exist/i,
+      },
+    ];
+
+    for (const { id, expectedStatus, messagePattern } of invalidIdCases) {
+      const res = await request(app)
+        .post(`/api/vehicles/${id}/restock`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ quantity: 10 });
+
+      expect(res.statusCode).toBe(expectedStatus);
+      expect(res.body).toHaveProperty('status', 'fail');
+      expect(res.body.message).toMatch(messagePattern);
+    }
+  });
+
+  it('should reject restock with invalid or missing quantity', async () => {
+    const invalidDataCases = [
+      { quantity: -5 }, // negative
+      { quantity: 2.5 }, // float
+      { quantity: 'invalid-number' }, // string
+      {}, // missing
+    ];
+
+    for (const invalidPayload of invalidDataCases) {
+      const res = await request(app)
+        .post(`/api/vehicles/${vehicle._id}/restock`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send(invalidPayload);
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body).toHaveProperty('status', 'fail');
+      expect(res.body.message).toMatch(/required|invalid|positive|whole number|quantity/i);
+    }
+  });
+});
+
+
 
