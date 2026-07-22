@@ -398,3 +398,89 @@ describe('PUT /api/vehicles/:id', () => {
     expect(vehicleInDb.quantity).toBe(existingVehicle.quantity);
   });
 });
+
+describe('DELETE /api/vehicles/:id', () => {
+  const existingVehicle = {
+    brand: 'Toyota',
+    model: 'Camry',
+    category: 'Sedan',
+    price: 28999,
+    quantity: 5,
+  };
+
+  let adminToken;
+  let userToken;
+  let vehicle;
+
+  beforeEach(async () => {
+    const adminUser = await User.create({
+      name: 'Admin User',
+      email: 'admin@example.com',
+      password: 'password123',
+      role: 'admin',
+    });
+
+    const regularUser = await User.create({
+      name: 'Regular User',
+      email: 'user@example.com',
+      password: 'password123',
+      role: 'user',
+    });
+
+    adminToken = generateToken(adminUser._id);
+    userToken = generateToken(regularUser._id);
+
+    vehicle = await Vehicle.create(existingVehicle);
+  });
+
+  it('should allow an admin to delete a vehicle', async () => {
+    const res = await request(app)
+      .delete(`/api/vehicles/${vehicle._id}`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty('status', 'success');
+
+    const vehicleInDb = await Vehicle.findById(vehicle._id);
+    expect(vehicleInDb).toBeNull();
+  });
+
+  it('should reject vehicle deletion by a normal user', async () => {
+    const res = await request(app)
+      .delete(`/api/vehicles/${vehicle._id}`)
+      .set('Authorization', `Bearer ${userToken}`);
+
+    expect(res.statusCode).toBe(403);
+    expect(res.body).toHaveProperty('status', 'fail');
+    expect(res.body.message).toMatch(/permission|authorized|forbidden/i);
+
+    const vehicleInDb = await Vehicle.findById(vehicle._id);
+    expect(vehicleInDb).not.toBeNull();
+  });
+
+  it('should reject invalid vehicle IDs', async () => {
+    const invalidIdCases = [
+      {
+        id: 'invalid-id-format',
+        expectedStatus: 400,
+        messagePattern: /invalid|id/i,
+      },
+      {
+        id: new mongoose.Types.ObjectId(),
+        expectedStatus: 404,
+        messagePattern: /not found|exist/i,
+      },
+    ];
+
+    for (const { id, expectedStatus, messagePattern } of invalidIdCases) {
+      const res = await request(app)
+        .delete(`/api/vehicles/${id}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(res.statusCode).toBe(expectedStatus);
+      expect(res.body).toHaveProperty('status', 'fail');
+      expect(res.body.message).toMatch(messagePattern);
+    }
+  });
+});
+
