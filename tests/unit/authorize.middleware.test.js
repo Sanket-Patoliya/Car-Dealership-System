@@ -16,7 +16,7 @@ testApp.get('/admin-route', protect, adminOnly, (req, res) => {
   });
 });
 
-testApp.get('/user-or-admin-route', protect, restrictTo('user', 'admin'), (req, res) => {
+testApp.get('/user-or-admin-route', protect, restrictTo('USER', 'ADMIN'), (req, res) => {
   res.status(200).json({
     status: 'success',
     message: 'Access granted',
@@ -36,18 +36,18 @@ describe('Authorize Middleware', () => {
       name: 'Admin User',
       email: 'admin@example.com',
       password: 'password123',
-      role: 'admin',
+      role: 'ADMIN',
     });
 
     regularUser = await User.create({
       name: 'Regular User',
       email: 'user@example.com',
       password: 'password123',
-      role: 'user',
+      role: 'USER',
     });
 
-    adminToken = generateToken(adminUser._id);
-    userToken = generateToken(regularUser._id);
+    adminToken = generateToken(adminUser._id, adminUser.role);
+    userToken = generateToken(regularUser._id, regularUser.role);
   });
 
   describe('adminOnly', () => {

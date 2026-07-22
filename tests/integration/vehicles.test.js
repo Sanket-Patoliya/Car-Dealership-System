@@ -22,18 +22,18 @@ describe('POST /api/vehicles', () => {
       name: 'Admin User',
       email: 'admin@example.com',
       password: 'password123',
-      role: 'admin',
+      role: 'ADMIN',
     });
 
     const regularUser = await User.create({
       name: 'Regular User',
       email: 'user@example.com',
       password: 'password123',
-      role: 'user',
+      role: 'USER',
     });
 
-    adminToken = generateToken(adminUser._id);
-    userToken = generateToken(regularUser._id);
+    adminToken = generateToken(adminUser._id, adminUser.role);
+    userToken = generateToken(regularUser._id, regularUser.role);
   });
 
   it('should allow an admin to create a vehicle', async () => {
@@ -292,18 +292,18 @@ describe('PUT /api/vehicles/:id', () => {
       name: 'Admin User',
       email: 'admin@example.com',
       password: 'password123',
-      role: 'admin',
+      role: 'ADMIN',
     });
 
     const regularUser = await User.create({
       name: 'Regular User',
       email: 'user@example.com',
       password: 'password123',
-      role: 'user',
+      role: 'USER',
     });
 
-    adminToken = generateToken(adminUser._id);
-    userToken = generateToken(regularUser._id);
+    adminToken = generateToken(adminUser._id, adminUser.role);
+    userToken = generateToken(regularUser._id, regularUser.role);
 
     vehicle = await Vehicle.create(existingVehicle);
   });
@@ -417,18 +417,18 @@ describe('DELETE /api/vehicles/:id', () => {
       name: 'Admin User',
       email: 'admin@example.com',
       password: 'password123',
-      role: 'admin',
+      role: 'ADMIN',
     });
 
     const regularUser = await User.create({
       name: 'Regular User',
       email: 'user@example.com',
       password: 'password123',
-      role: 'user',
+      role: 'USER',
     });
 
-    adminToken = generateToken(adminUser._id);
-    userToken = generateToken(regularUser._id);
+    adminToken = generateToken(adminUser._id, adminUser.role);
+    userToken = generateToken(regularUser._id, regularUser.role);
 
     vehicle = await Vehicle.create(existingVehicle);
   });
@@ -501,10 +501,10 @@ describe('POST /api/vehicles/:id/purchase', () => {
       name: 'Regular User',
       email: 'user@example.com',
       password: 'password123',
-      role: 'user',
+      role: 'USER',
     });
 
-    userToken = generateToken(regularUser._id);
+    userToken = generateToken(regularUser._id, regularUser.role);
     vehicle = await Vehicle.create(existingVehicle);
   });
 
@@ -584,18 +584,18 @@ describe('POST /api/vehicles/:id/restock', () => {
       name: 'Admin User',
       email: 'admin@example.com',
       password: 'password123',
-      role: 'admin',
+      role: 'ADMIN',
     });
 
     const regularUser = await User.create({
       name: 'Regular User',
       email: 'user@example.com',
       password: 'password123',
-      role: 'user',
+      role: 'USER',
     });
 
-    adminToken = generateToken(adminUser._id);
-    userToken = generateToken(regularUser._id);
+    adminToken = generateToken(adminUser._id, adminUser.role);
+    userToken = generateToken(regularUser._id, regularUser.role);
     vehicle = await Vehicle.create(existingVehicle);
   });
 

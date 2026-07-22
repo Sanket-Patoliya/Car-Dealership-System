@@ -10,8 +10,8 @@ const AdminRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 text-teal-400 flex items-center justify-center font-sans">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-400"></div>
+      <div className="min-h-screen bg-slate-50 text-indigo-600 flex items-center justify-center font-sans">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
       </div>
     );
   }
@@ -22,7 +22,7 @@ const AdminRoute = ({ children }) => {
   }
 
   // Redirect to regular dashboard if authenticated but not an admin
-  if (user?.role !== 'admin') {
+  if (user?.role !== 'ADMIN') {
     return <Navigate to="/" replace />;
   }
 

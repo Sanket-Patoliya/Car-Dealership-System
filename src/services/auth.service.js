@@ -10,27 +10,28 @@ import { generateToken } from '../utils/jwt.js';
  * @param {string} userData.password
  * @returns {Promise<Object>} The newly created User document
  */
-export const registerUser = async ({ name, email, password }) => {
+export const registerUser = async ({ name, email, password, role }) => {
   // 1. Validate required fields
   if (!name || !email || !password) {
-    const error = new Error('Name, email, and password are required validation fields');
+    const error = new Error('Name, email, and password are required');
     error.statusCode = 400;
     throw error;
   }
 
-  // 2. Reject duplicate email addresses
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    const error = new Error('Email address already exists/registered');
+  // 2. Check if email is already taken
+  const emailExists = await User.findOne({ email });
+  if (emailExists) {
+    const error = new Error('Email is already registered');
     error.statusCode = 400;
     throw error;
   }
 
-  // 3. Create user (password is automatically hashed via model pre-save hook)
+  // 3. Create a new user (pre-save hook hashes password)
   const newUser = await User.create({
     name,
     email,
     password,
+    role,
   });
 
   return newUser;
@@ -68,7 +69,7 @@ export const loginUser = async ({ email, password }) => {
   }
 
   // 4. Generate JWT
-  const token = generateToken(user._id);
+  const token = generateToken(user._id, user.role);
 
   return { user, token };
 };

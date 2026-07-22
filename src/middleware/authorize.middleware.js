@@ -26,4 +26,4 @@ export const restrictTo = (...roles) => {
 /**
  * Shorthand for admin-only routes.
  */
-export const adminOnly = restrictTo('admin');
+export const adminOnly = restrictTo('ADMIN');

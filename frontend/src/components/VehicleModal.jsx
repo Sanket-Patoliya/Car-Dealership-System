@@ -70,21 +70,21 @@ const VehicleModal = ({ isOpen, mode, vehicle, onClose, onSubmit }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Dark overlay with blur */}
+      {/* Overlay */}
       <div 
-        className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity duration-300"
+        className="absolute inset-0 bg-slate-950/40 backdrop-blur-xs transition-opacity duration-300"
         onClick={onClose}
       ></div>
 
-      {/* Modal glass panel container */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg shadow-2xl z-10 overflow-hidden relative animate-in fade-in zoom-in-95 duration-200">
-        <div className="p-6 border-b border-slate-800 flex items-center justify-between">
-          <h3 className="text-xl font-bold text-white capitalize">
+      {/* Modal Container */}
+      <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-lg shadow-2xl z-10 overflow-hidden relative animate-in fade-in zoom-in-95 duration-200">
+        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+          <h3 className="text-xl font-bold text-slate-900 capitalize">
             {mode === 'add' ? 'Add Vehicle' : mode === 'edit' ? 'Edit Vehicle Details' : 'Restock Vehicle'}
           </h3>
           <button 
             onClick={onClose}
-            className="text-slate-400 hover:text-white transition-colors duration-300 text-2xl font-light"
+            className="text-slate-400 hover:text-slate-700 transition-colors duration-300 text-2xl font-light outline-none"
           >
             &times;
           </button>
@@ -92,24 +92,24 @@ const VehicleModal = ({ isOpen, mode, vehicle, onClose, onSubmit }) => {
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-xs text-red-400">
+            <div className="bg-rose-50 border border-rose-250 rounded-xl p-4 text-xs text-rose-600">
               {error}
             </div>
           )}
 
           {mode === 'restock' ? (
             <div>
-              <p className="text-slate-400 text-sm mb-4">
-                Restock inventory for <span className="font-semibold text-white">{vehicle?.brand} {vehicle?.model}</span>. Current stock is <span className="text-teal-400 font-semibold">{vehicle?.quantity}</span>.
+              <p className="text-slate-500 text-sm mb-4">
+                Restock inventory for <span className="font-semibold text-slate-900">{vehicle?.brand} {vehicle?.model}</span>. Current stock is <span className="text-indigo-600 font-semibold">{vehicle?.quantity}</span>.
               </p>
-              <label htmlFor="restockQty" className="block text-sm font-semibold text-slate-300 mb-2">
+              <label htmlFor="restockQty" className="block text-sm font-semibold text-slate-700 mb-2">
                 Quantity to Add
               </label>
               <input
                 id="restockQty"
                 type="number"
                 required
-                className="w-full bg-slate-950/60 border border-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 rounded-xl px-4 py-3 text-white placeholder-slate-600 outline-none transition-all duration-300"
+                className="w-full bg-white border border-slate-300 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 outline-none transition-all duration-300"
                 placeholder="10"
                 value={restockQty}
                 onChange={(e) => setRestockQty(e.target.value)}
@@ -119,28 +119,28 @@ const VehicleModal = ({ isOpen, mode, vehicle, onClose, onSubmit }) => {
             <>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="brand" className="block text-sm font-semibold text-slate-300 mb-2">
+                  <label htmlFor="brand" className="block text-sm font-semibold text-slate-700 mb-2">
                     Brand (Make)
                   </label>
                   <input
                     id="brand"
                     type="text"
                     required
-                    className="w-full bg-slate-950/60 border border-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 rounded-xl px-4 py-3 text-white placeholder-slate-600 outline-none transition-all duration-300"
+                    className="w-full bg-white border border-slate-300 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 outline-none transition-all duration-300"
                     placeholder="Toyota"
                     value={brand}
                     onChange={(e) => setBrand(e.target.value)}
                   />
                 </div>
                 <div>
-                  <label htmlFor="model" className="block text-sm font-semibold text-slate-300 mb-2">
+                  <label htmlFor="model" className="block text-sm font-semibold text-slate-700 mb-2">
                     Model
                   </label>
                   <input
                     id="model"
                     type="text"
                     required
-                    className="w-full bg-slate-950/60 border border-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 rounded-xl px-4 py-3 text-white placeholder-slate-600 outline-none transition-all duration-300"
+                    className="w-full bg-white border border-slate-300 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 outline-none transition-all duration-300"
                     placeholder="Camry"
                     value={model}
                     onChange={(e) => setModel(e.target.value)}
@@ -149,17 +149,17 @@ const VehicleModal = ({ isOpen, mode, vehicle, onClose, onSubmit }) => {
               </div>
 
               <div>
-                <label htmlFor="category" className="block text-sm font-semibold text-slate-300 mb-2">
+                <label htmlFor="category" className="block text-sm font-semibold text-slate-700 mb-2">
                   Category
                 </label>
                 <select
                   id="category"
-                  className="w-full bg-slate-950/60 border border-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 rounded-xl px-4 py-3 text-white outline-none transition-all duration-300"
+                  className="w-full bg-white border border-slate-300 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 rounded-xl px-4 py-3 text-slate-900 outline-none transition-all duration-300"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                 >
                   {categories.map((cat) => (
-                    <option key={cat} value={cat} className="bg-slate-950 text-white">
+                    <option key={cat} value={cat} className="bg-white text-slate-900">
                       {cat}
                     </option>
                   ))}
@@ -168,7 +168,7 @@ const VehicleModal = ({ isOpen, mode, vehicle, onClose, onSubmit }) => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="price" className="block text-sm font-semibold text-slate-300 mb-2">
+                  <label htmlFor="price" className="block text-sm font-semibold text-slate-700 mb-2">
                     Price ($)
                   </label>
                   <input
@@ -177,14 +177,14 @@ const VehicleModal = ({ isOpen, mode, vehicle, onClose, onSubmit }) => {
                     required
                     min="0"
                     step="0.01"
-                    className="w-full bg-slate-950/60 border border-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 rounded-xl px-4 py-3 text-white placeholder-slate-600 outline-none transition-all duration-300"
+                    className="w-full bg-white border border-slate-300 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 outline-none transition-all duration-300"
                     placeholder="29999"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                   />
                 </div>
                 <div>
-                  <label htmlFor="quantity" className="block text-sm font-semibold text-slate-300 mb-2">
+                  <label htmlFor="quantity" className="block text-sm font-semibold text-slate-700 mb-2">
                     Initial Quantity
                   </label>
                   <input
@@ -192,7 +192,7 @@ const VehicleModal = ({ isOpen, mode, vehicle, onClose, onSubmit }) => {
                     type="number"
                     required
                     min="0"
-                    className="w-full bg-slate-950/60 border border-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 rounded-xl px-4 py-3 text-white placeholder-slate-600 outline-none transition-all duration-300"
+                    className="w-full bg-white border border-slate-300 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 outline-none transition-all duration-300"
                     placeholder="5"
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
@@ -206,13 +206,13 @@ const VehicleModal = ({ isOpen, mode, vehicle, onClose, onSubmit }) => {
             <button
               type="button"
               onClick={onClose}
-              className="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-5 rounded-xl text-sm transition-all duration-300"
+              className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 px-5 rounded-xl text-sm transition-all duration-300"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-400 hover:to-indigo-500 text-white font-semibold py-2.5 px-5 rounded-xl text-sm transition-all duration-300 shadow-md shadow-teal-500/10"
+              className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 px-5 rounded-xl text-sm transition-all duration-300 shadow-md shadow-indigo-600/10"
             >
               {mode === 'add' ? 'Create' : mode === 'edit' ? 'Save Changes' : 'Restock'}
             </button>

@@ -30,7 +30,7 @@ describe('Auth Middleware: protect', () => {
       email: 'testauth@example.com',
       password: 'password123',
     });
-    validToken = generateToken(user._id);
+    validToken = generateToken(user._id, user.role);
   });
 
   it('should allow access if a valid token is provided in Authorization header', async () => {
@@ -75,7 +75,7 @@ describe('Auth Middleware: protect', () => {
 
   it('should reject access if the user belonging to the token no longer exists', async () => {
     const randomId = new mongoose.Types.ObjectId();
-    const tokenForNonexistentUser = generateToken(randomId);
+    const tokenForNonexistentUser = generateToken(randomId, 'USER');
 
     const res = await request(testApp)
       .get('/protected-route')

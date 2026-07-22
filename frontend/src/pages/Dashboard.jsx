@@ -128,30 +128,28 @@ const Dashboard = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-slate-950 text-white font-sans relative overflow-hidden">
-      {/* Dynamic Background Glowing Circles */}
-      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-teal-500/5 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-3xl animate-pulse delay-700"></div>
+  const isAdmin = user?.role === 'ADMIN';
 
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans relative">
       {/* Premium Header */}
-      <header className="border-b border-slate-900 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40 relative">
+      <header className="border-b border-slate-200 bg-white/90 backdrop-blur-md sticky top-0 z-40 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <span className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-teal-400 to-indigo-500 bg-clip-text text-transparent">
-              AUTOmata
+            <span className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-600 to-indigo-800 bg-clip-text text-transparent">
+              CarHub
             </span>
           </div>
 
           <div className="flex items-center space-x-6">
             <div className="text-right hidden sm:block">
-              <div className="text-sm font-semibold text-slate-200">{user?.name}</div>
-              <div className="text-xs text-teal-400 capitalize">{user?.role}</div>
+              <div className="text-sm font-semibold text-slate-800">{user?.name}</div>
+              <div className="text-xs text-indigo-600 font-medium capitalize">{user?.role}</div>
             </div>
             
             <button
               onClick={logout}
-              className="bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white font-semibold py-2 px-4 rounded-xl border border-slate-800 transition-all duration-300 text-sm"
+              className="bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 font-semibold py-2 px-4 rounded-xl border border-slate-350 transition-all duration-300 text-sm shadow-xs"
             >
               Sign Out
             </button>
@@ -164,17 +162,17 @@ const Dashboard = () => {
         {/* Dashboard Title & Meta / Admin Add Vehicle */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
           <div>
-            <h2 className="text-3xl font-extrabold tracking-tight">Active Inventory</h2>
-            <p className="text-slate-400 mt-1">Explore and manage high-performance vehicles.</p>
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-950">Active Inventory</h2>
+            <p className="text-slate-500 mt-1">Explore and manage high-performance vehicles.</p>
           </div>
-          {user?.role === 'admin' && (
+          {isAdmin && (
             <button
               onClick={() => {
                 setSelectedVehicle(null);
                 setModalMode('add');
                 setIsModalOpen(true);
               }}
-              className="bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-400 hover:to-indigo-500 text-white font-semibold py-2.5 px-6 rounded-xl text-sm transition-all duration-300 shadow-md shadow-teal-500/10"
+              className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 px-6 rounded-xl text-sm transition-all duration-300 shadow-md shadow-indigo-600/10"
             >
               Add Vehicle
             </button>
@@ -182,15 +180,15 @@ const Dashboard = () => {
         </div>
 
         {/* Filter and Search Bar */}
-        <form onSubmit={handleApplyFilters} className="bg-slate-900/30 backdrop-blur-md border border-slate-900 rounded-3xl p-6 mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+        <form onSubmit={handleApplyFilters} className="bg-white border border-slate-200 rounded-3xl p-6 mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end shadow-sm">
           <div>
-            <label htmlFor="make-filter" className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+            <label htmlFor="make-filter" className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
               Make
             </label>
             <input
               id="make-filter"
               type="text"
-              className="w-full bg-slate-950/60 border border-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 rounded-xl px-4 py-2.5 text-white placeholder-slate-600 outline-none text-sm transition-all duration-300"
+              className="w-full bg-white border border-slate-350 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 rounded-xl px-4 py-2.5 text-slate-900 placeholder-slate-400 outline-none text-sm transition-all duration-300"
               placeholder="Toyota"
               value={make}
               onChange={(e) => setMake(e.target.value)}
@@ -198,13 +196,13 @@ const Dashboard = () => {
           </div>
 
           <div>
-            <label htmlFor="model-filter" className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+            <label htmlFor="model-filter" className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
               Model
             </label>
             <input
               id="model-filter"
               type="text"
-              className="w-full bg-slate-950/60 border border-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 rounded-xl px-4 py-2.5 text-white placeholder-slate-600 outline-none text-sm transition-all duration-300"
+              className="w-full bg-white border border-slate-355 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 rounded-xl px-4 py-2.5 text-slate-900 placeholder-slate-400 outline-none text-sm transition-all duration-300"
               placeholder="Camry"
               value={model}
               onChange={(e) => setModel(e.target.value)}
@@ -212,12 +210,12 @@ const Dashboard = () => {
           </div>
 
           <div>
-            <label htmlFor="category-filter" className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+            <label htmlFor="category-filter" className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
               Category
             </label>
             <select
               id="category-filter"
-              className="w-full bg-slate-950/60 border border-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 rounded-xl px-4 py-2.5 text-white outline-none text-sm transition-all duration-300"
+              className="w-full bg-white border border-slate-360 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 rounded-xl px-4 py-2.5 text-slate-900 outline-none text-sm transition-all duration-300"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             >
@@ -231,23 +229,23 @@ const Dashboard = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
               Price Range ($)
             </label>
             <div className="flex items-center space-x-2">
               <input
                 type="number"
                 aria-label="Minimum Price"
-                className="w-1/2 bg-slate-950/60 border border-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 rounded-xl px-3 py-2.5 text-white placeholder-slate-600 outline-none text-sm transition-all duration-300"
+                className="w-1/2 bg-white border border-slate-350 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 rounded-xl px-3 py-2.5 text-slate-900 placeholder-slate-400 outline-none text-sm transition-all duration-300"
                 placeholder="Min"
                 value={minPrice}
                 onChange={(e) => setMinPrice(e.target.value)}
               />
-              <span className="text-slate-600">-</span>
+              <span className="text-slate-400">-</span>
               <input
                 type="number"
                 aria-label="Maximum Price"
-                className="w-1/2 bg-slate-950/60 border border-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 rounded-xl px-3 py-2.5 text-white placeholder-slate-600 outline-none text-sm transition-all duration-300"
+                className="w-1/2 bg-white border border-slate-350 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 rounded-xl px-3 py-2.5 text-slate-900 placeholder-slate-400 outline-none text-sm transition-all duration-300"
                 placeholder="Max"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}
@@ -258,14 +256,14 @@ const Dashboard = () => {
           <div className="flex space-x-2">
             <button
               type="submit"
-              className="flex-1 bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-400 hover:to-indigo-500 text-white font-semibold py-2.5 px-4 rounded-xl text-sm transition-all duration-300 shadow-md shadow-teal-500/10"
+              className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 px-4 rounded-xl text-sm transition-all duration-300 shadow-md shadow-indigo-600/10"
             >
               Apply
             </button>
             <button
               type="button"
               onClick={handleClearFilters}
-              className="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-3 rounded-xl text-sm transition-all duration-300 border border-slate-700"
+              className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 px-3 rounded-xl text-sm transition-all duration-300 border border-slate-200"
             >
               Reset
             </button>
@@ -274,12 +272,12 @@ const Dashboard = () => {
 
         {/* Dynamic States */}
         {error && (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-6 text-red-400 mb-8 max-w-lg shadow-xl">
+          <div className="bg-rose-50 border border-rose-200 rounded-2xl p-6 text-rose-700 mb-8 max-w-lg shadow-sm">
             <h4 className="font-bold mb-1">Error Loading Inventory</h4>
             <p className="text-sm">{error}</p>
             <button
               onClick={handleApplyFilters}
-              className="mt-4 bg-red-500/20 hover:bg-red-500/30 text-red-400 font-semibold py-1.5 px-4 rounded-xl text-xs transition-all duration-300"
+              className="mt-4 bg-rose-100 hover:bg-rose-200 text-rose-700 font-semibold py-1.5 px-4 rounded-xl text-xs transition-all duration-300 border border-rose-200"
             >
               Retry
             </button>
@@ -290,24 +288,24 @@ const Dashboard = () => {
           /* Loading State Grid Skeleton */
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((n) => (
-              <div key={n} className="bg-slate-900/20 border border-slate-900 rounded-2xl p-6 h-64 animate-pulse flex flex-col justify-between">
+              <div key={n} className="bg-white border border-slate-200 rounded-2xl p-6 h-64 animate-pulse flex flex-col justify-between shadow-xs">
                 <div>
                   <div className="flex justify-between items-center mb-4">
-                    <div className="h-6 w-20 bg-slate-800 rounded-full"></div>
-                    <div className="h-6 w-24 bg-slate-800 rounded-full"></div>
+                    <div className="h-6 w-20 bg-slate-200 rounded-full"></div>
+                    <div className="h-6 w-24 bg-slate-200 rounded-full"></div>
                   </div>
-                  <div className="h-6 w-40 bg-slate-800 rounded mb-2"></div>
-                  <div className="h-8 w-28 bg-slate-800 rounded"></div>
+                  <div className="h-6 w-40 bg-slate-200 rounded mb-2"></div>
+                  <div className="h-8 w-28 bg-slate-200 rounded"></div>
                 </div>
-                <div className="h-10 bg-slate-800 rounded-xl w-full"></div>
+                <div className="h-10 bg-slate-200 rounded-xl w-full"></div>
               </div>
             ))}
           </div>
         ) : vehicles.length === 0 ? (
           /* Empty State */
-          <div className="bg-slate-900/10 border border-slate-900 rounded-3xl p-12 text-center max-w-xl mx-auto mt-12 shadow-2xl">
+          <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center max-w-xl mx-auto mt-12 shadow-sm">
             <svg
-              className="mx-auto h-12 w-12 text-slate-600 mb-4"
+              className="mx-auto h-12 w-12 text-slate-400 mb-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -320,8 +318,8 @@ const Dashboard = () => {
                 d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
               />
             </svg>
-            <h3 className="text-xl font-bold text-white mb-2">No Vehicles Found</h3>
-            <p className="text-slate-400 text-sm">
+            <h3 className="text-xl font-bold text-slate-900 mb-2">No Vehicles Found</h3>
+            <p className="text-slate-500 text-sm">
               Try adjusting your search criteria or clearing active filters.
             </p>
           </div>
@@ -353,6 +351,11 @@ const Dashboard = () => {
         }}
         onSubmit={handleModalSubmit}
       />
+
+      {/* Footer Branding */}
+      <footer className="border-t border-slate-200 mt-20 py-8 bg-white relative z-10 text-center text-sm text-slate-500">
+        &copy; {new Date().getFullYear()} CarHub Dealership. All rights reserved.
+      </footer>
     </div>
   );
 };
