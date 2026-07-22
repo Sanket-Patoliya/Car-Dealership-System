@@ -151,4 +151,38 @@ export const deleteVehicle = async (id) => {
   }
 };
 
+/**
+ * Purchase a vehicle: atomically decrements quantity by 1 if in stock.
+ * @param {string} id - The vehicle ID to purchase
+ * @returns {Promise<Object>} Formatted updated vehicle
+ */
+export const purchaseVehicle = async (id) => {
+  // 1. Validate ObjectId format
+  validateObjectId(id, 'vehicle ID');
+
+  // 2. Perform atomic decrement if quantity > 0
+  const vehicle = await Vehicle.findOneAndUpdate(
+    { _id: id, quantity: { $gt: 0 } },
+    { $inc: { quantity: -1 } },
+    { new: true }
+  );
+
+  // 3. Handle errors if the atomic update failed
+  if (!vehicle) {
+    const exists = await Vehicle.findById(id);
+    if (!exists) {
+      const error = new Error('Vehicle not found');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const error = new Error('Vehicle is out of stock');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return formatVehicle(vehicle);
+};
+
+
 
