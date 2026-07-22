@@ -170,3 +170,98 @@ describe('GET /api/vehicles', () => {
     expect(returnedVehicle).toHaveProperty('quantity', 7);
   });
 });
+
+describe('GET /api/vehicles/search', () => {
+  beforeEach(async () => {
+    await Vehicle.create([
+      {
+        brand: 'Toyota',
+        model: 'Camry',
+        category: 'Sedan',
+        price: 28999,
+        quantity: 5,
+      },
+      {
+        brand: 'Toyota',
+        model: 'RAV4',
+        category: 'SUV',
+        price: 35000,
+        quantity: 8,
+      },
+      {
+        brand: 'Tesla',
+        model: 'Model 3',
+        category: 'Electric',
+        price: 42990,
+        quantity: 12,
+      },
+      {
+        brand: 'BMW',
+        model: 'X5',
+        category: 'SUV',
+        price: 65900,
+        quantity: 3,
+      },
+      {
+        brand: 'Honda',
+        model: 'Civic',
+        category: 'Hatchback',
+        price: 22000,
+        quantity: 10,
+      },
+    ]);
+  });
+
+  it('should search vehicles by make', async () => {
+    const res = await request(app).get('/api/vehicles/search').query({ make: 'Toyota' });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty('status', 'success');
+    expect(res.body.data).toHaveProperty('vehicles');
+    expect(res.body.data.vehicles).toHaveLength(2);
+    expect(res.body.data.vehicles.every((vehicle) => vehicle.brand === 'Toyota')).toBe(true);
+  });
+
+  it('should search vehicles by model', async () => {
+    const res = await request(app).get('/api/vehicles/search').query({ model: 'Camry' });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty('status', 'success');
+    expect(res.body.data.vehicles).toHaveLength(1);
+    expect(res.body.data.vehicles[0]).toMatchObject({
+      brand: 'Toyota',
+      model: 'Camry',
+      category: 'Sedan',
+      price: 28999,
+    });
+  });
+
+  it('should search vehicles by category', async () => {
+    const res = await request(app).get('/api/vehicles/search').query({ category: 'SUV' });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty('status', 'success');
+    expect(res.body.data.vehicles).toHaveLength(2);
+    expect(res.body.data.vehicles.every((vehicle) => vehicle.category === 'SUV')).toBe(true);
+  });
+
+  it('should search vehicles by price range', async () => {
+    const res = await request(app)
+      .get('/api/vehicles/search')
+      .query({ minPrice: 30000, maxPrice: 50000 });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty('status', 'success');
+    expect(res.body.data.vehicles).toHaveLength(2);
+    expect(res.body.data.vehicles.every((vehicle) => vehicle.price >= 30000 && vehicle.price <= 50000)).toBe(true);
+  });
+
+  it('should return an empty array when no vehicles match', async () => {
+    const res = await request(app).get('/api/vehicles/search').query({ make: 'NonExistent' });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty('status', 'success');
+    expect(res.body.data).toHaveProperty('vehicles');
+    expect(res.body.data.vehicles).toEqual([]);
+  });
+});
