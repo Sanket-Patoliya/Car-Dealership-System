@@ -1,4 +1,4 @@
-import { createVehicle, getAllVehicles } from '../services/vehicle.service.js';
+import { createVehicle, getAllVehicles, searchVehicles } from '../services/vehicle.service.js';
 import { catchAsync } from '../utils/catchAsync.js';
 
 export const create = catchAsync(async (req, res) => {
@@ -12,6 +12,15 @@ export const create = catchAsync(async (req, res) => {
 
 export const getAll = catchAsync(async (req, res) => {
   const vehicles = await getAllVehicles();
+
+  return res.status(200).json({
+    status: 'success',
+    data: { vehicles },
+  });
+});
+
+export const search = catchAsync(async (req, res) => {
+  const vehicles = await searchVehicles(req.query);
 
   return res.status(200).json({
     status: 'success',

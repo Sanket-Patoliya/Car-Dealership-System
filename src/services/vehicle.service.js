@@ -53,3 +53,25 @@ export const getAllVehicles = async () => {
   const vehicles = await Vehicle.find();
   return vehicles.map(formatVehicle);
 };
+
+/**
+ * Search vehicles using optional filters.
+ * @param {Object} filters
+ * @returns {Promise<Object[]>} Formatted matching vehicles for API response
+ */
+export const searchVehicles = async ({ make, model, category, minPrice, maxPrice }) => {
+  const filter = {};
+
+  if (make) filter.brand = make;
+  if (model) filter.model = model;
+  if (category) filter.category = category;
+
+  if (minPrice !== undefined || maxPrice !== undefined) {
+    filter.price = {};
+    if (minPrice !== undefined) filter.price.$gte = Number(minPrice);
+    if (maxPrice !== undefined) filter.price.$lte = Number(maxPrice);
+  }
+
+  const vehicles = await Vehicle.find(filter);
+  return vehicles.map(formatVehicle);
+};
