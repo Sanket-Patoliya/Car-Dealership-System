@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import authRouter from './routes/auth.routes.js';
+import vehicleRouter from './routes/vehicle.routes.js';
 import { errorHandler } from './middleware/error.middleware.js';
 
 const app = express();
@@ -15,6 +16,9 @@ app.use(express.json());
 
 // Auth Routes
 app.use('/api/auth', authRouter);
+
+// Vehicle Routes
+app.use('/api/vehicles', vehicleRouter);
 
 // Base Health Check Route
 app.get('/api/health', (req, res) => {
