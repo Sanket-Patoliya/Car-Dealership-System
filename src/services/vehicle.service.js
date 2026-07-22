@@ -184,5 +184,47 @@ export const purchaseVehicle = async (id) => {
   return formatVehicle(vehicle);
 };
 
+/**
+ * Restocks a vehicle: increments its quantity.
+ * @param {string} id - The vehicle ID to restock
+ * @param {number} quantity - The quantity to add
+ * @returns {Promise<Object>} Formatted updated vehicle
+ */
+export const restockVehicle = async (id, quantity) => {
+  // 1. Validate ObjectId format
+  validateObjectId(id, 'vehicle ID');
+
+  // 2. Validate restock quantity
+  if (quantity === undefined || quantity === null || quantity === '') {
+    const error = new Error('Restock quantity is required');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const parsedQty = Number(quantity);
+  if (isNaN(parsedQty) || parsedQty <= 0 || !Number.isInteger(parsedQty)) {
+    const error = new Error('Restock quantity must be a positive whole number');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  // 3. Find and update the vehicle
+  const vehicle = await Vehicle.findByIdAndUpdate(
+    id,
+    { $inc: { quantity: parsedQty } },
+    { new: true, runValidators: true }
+  );
+
+  // 4. Reject if not found
+  if (!vehicle) {
+    const error = new Error('Vehicle not found');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  return formatVehicle(vehicle);
+};
+
+
 
 

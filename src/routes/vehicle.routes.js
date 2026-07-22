@@ -1,5 +1,5 @@
 import express from 'express';
-import { create, getAll, search, update, remove, purchase } from '../controllers/vehicle.controller.js';
+import { create, getAll, search, update, remove, purchase, restock } from '../controllers/vehicle.controller.js';
 import { protect } from '../middleware/auth.middleware.js';
 import { adminOnly } from '../middleware/authorize.middleware.js';
 
@@ -11,5 +11,6 @@ router.post('/', protect, adminOnly, create);
 router.put('/:id', protect, adminOnly, update);
 router.delete('/:id', protect, adminOnly, remove);
 router.post('/:id/purchase', protect, purchase);
+router.post('/:id/restock', protect, adminOnly, restock);
 
 export default router;
