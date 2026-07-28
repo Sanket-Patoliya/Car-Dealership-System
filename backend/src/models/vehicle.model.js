@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { VEHICLE_CATEGORIES } from '../constants/vehicle.constants.js';
 
 const vehicleSchema = new mongoose.Schema(
   {
@@ -16,8 +17,8 @@ const vehicleSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Category is required'],
       enum: {
-        values: ['SUV', 'Sedan', 'Hatchback', 'Luxury', 'Electric'],
-        message: 'Category must be one of: SUV, Sedan, Hatchback, Luxury, Electric',
+        values: VEHICLE_CATEGORIES,
+        message: `Category must be one of: ${VEHICLE_CATEGORIES.join(', ')}`,
       },
     },
     price: {

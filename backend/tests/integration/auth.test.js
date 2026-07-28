@@ -66,6 +66,24 @@ describe('POST /api/auth/register', () => {
       expect(res.body.message).toMatch(/required|missing|validate|validation/i);
     }
   });
+
+  it('should reject registration if email format is invalid or password is too short', async () => {
+    const invalidEmailRes = await request(app)
+      .post('/api/auth/register')
+      .send({ name: 'John Doe', email: 'invalid-email', password: 'password123' });
+
+    expect(invalidEmailRes.statusCode).toBe(400);
+    expect(invalidEmailRes.body).toHaveProperty('status', 'fail');
+    expect(invalidEmailRes.body.message).toMatch(/valid email/i);
+
+    const shortPassRes = await request(app)
+      .post('/api/auth/register')
+      .send({ name: 'John Doe', email: 'john@example.com', password: '123' });
+
+    expect(shortPassRes.statusCode).toBe(400);
+    expect(shortPassRes.body).toHaveProperty('status', 'fail');
+    expect(shortPassRes.body.message).toMatch(/6 characters/i);
+  });
 });
 
 describe('POST /api/auth/login', () => {
@@ -128,7 +146,7 @@ describe('POST /api/auth/login', () => {
     expect(res.body.message).toMatch(/invalid|credentials|email|user/i);
   });
 
-  it('should reject login if required fields are missing', async () => {
+  it('should reject login if required fields are missing or email is invalid format', async () => {
     const testCases = [
       { password: 'password123' }, // email missing
       { email: 'jane@example.com' }, // password missing
@@ -144,6 +162,14 @@ describe('POST /api/auth/login', () => {
       expect(res.body).toHaveProperty('status', 'fail');
       expect(res.body.message).toMatch(/required|missing|validate|validation/i);
     }
+
+    const invalidEmailRes = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'not-an-email', password: 'password123' });
+
+    expect(invalidEmailRes.statusCode).toBe(400);
+    expect(invalidEmailRes.body).toHaveProperty('status', 'fail');
+    expect(invalidEmailRes.body.message).toMatch(/valid email/i);
   });
 });
 

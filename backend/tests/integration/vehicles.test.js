@@ -101,6 +101,23 @@ describe('POST /api/vehicles', () => {
     const vehicleCount = await Vehicle.countDocuments();
     expect(vehicleCount).toBe(0);
   });
+
+  it('should reject vehicle creation when token is missing or invalid', async () => {
+    const noTokenRes = await request(app)
+      .post('/api/vehicles')
+      .send(validVehicle);
+
+    expect(noTokenRes.statusCode).toBe(401);
+    expect(noTokenRes.body).toHaveProperty('status', 'fail');
+
+    const invalidTokenRes = await request(app)
+      .post('/api/vehicles')
+      .set('Authorization', 'Bearer invalid-token')
+      .send(validVehicle);
+
+    expect(invalidTokenRes.statusCode).toBe(401);
+    expect(invalidTokenRes.body).toHaveProperty('status', 'fail');
+  });
 });
 
 describe('GET /api/vehicles', () => {

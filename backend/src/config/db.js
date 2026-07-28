@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import User from '../models/user.model.js';
+import { ROLES } from '../constants/roles.js';
 
 /**
  * Seeds the default administrator user if it does not already exist.
@@ -15,7 +16,7 @@ const seedAdmin = async () => {
         name: 'Administrator',
         email: adminEmail,
         password: 'admin123',
-        role: 'ADMIN',
+        role: ROLES.ADMIN,
       });
       console.log(`[INFO] Admin user successfully seeded.`);
     } else {
@@ -31,8 +32,8 @@ const seedAdmin = async () => {
  */
 const normalizeUserRoles = async () => {
   try {
-    const legacyAdmins = await User.updateMany({ role: 'admin' }, { $set: { role: 'ADMIN' } });
-    const legacyUsers = await User.updateMany({ role: 'user' }, { $set: { role: 'USER' } });
+    const legacyAdmins = await User.updateMany({ role: 'admin' }, { $set: { role: ROLES.ADMIN } });
+    const legacyUsers = await User.updateMany({ role: 'user' }, { $set: { role: ROLES.USER } });
     if (legacyAdmins.modifiedCount > 0 || legacyUsers.modifiedCount > 0) {
       console.log(`[INFO] Migrated legacy roles: ${legacyAdmins.modifiedCount} admins, ${legacyUsers.modifiedCount} users to uppercase.`);
     }

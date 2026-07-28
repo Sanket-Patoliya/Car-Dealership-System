@@ -1,8 +1,10 @@
+import { ROLES } from '../constants/roles.js';
+
 /**
  * Restrict route access to users with one of the given roles.
  * Must be used after the protect middleware so req.user is set.
  *
- * @param {...string} roles - Allowed roles (e.g. 'admin', 'user')
+ * @param {...string} roles - Allowed roles (e.g. 'ADMIN', 'USER')
  * @returns {import('express').RequestHandler}
  */
 export const restrictTo = (...roles) => {
@@ -26,4 +28,5 @@ export const restrictTo = (...roles) => {
 /**
  * Shorthand for admin-only routes.
  */
-export const adminOnly = restrictTo('ADMIN');
+export const adminOnly = restrictTo(ROLES.ADMIN);
+

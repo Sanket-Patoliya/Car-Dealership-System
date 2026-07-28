@@ -1,6 +1,6 @@
 # 🚗 CarHub - Car Dealership Inventory System
 
-A full-stack **Car Dealership Inventory System** built using the **MERN Stack** following **Test-Driven Development (TDD)** principles. The application allows users to browse, search, and purchase vehicles while providing administrators with a secure dashboard to manage dealership inventory efficiently.
+A full-stack **Car Dealership Inventory System** built using the **MERN Stack** following **Test-Driven Development (TDD)** and **Clean Layered Architecture** principles. The project is organized into separate **`backend/`** and **`frontend/`** applications.
 
 ---
 
@@ -10,203 +10,143 @@ CarHub is a modern inventory management application designed for car dealerships
 
 ## 👤 User Features
 
-- User Registration
-- Secure Login using JWT Authentication
+- User Registration with express-validator sanitization
+- Secure Login using JWT Authentication & bcrypt hashing
 - Browse Available Vehicles
-- Search Vehicles
-- Filter Vehicles
-- Purchase Vehicles
+- Search Vehicles by make, model, category, and price range
+- Purchase Confirmation Page (`/purchase/:vehicleId`) with complete vehicle specifications and explicit user confirmation
 - Real-time Inventory Updates
 
 ## 👨‍💼 Admin Features
 
-- Add New Vehicles
+- Add New Vehicles with input validation
 - Update Vehicle Details
 - Delete Vehicles
-- Restock Vehicle Inventory
+- Restock Vehicle Inventory with atomic increments
 - Manage Complete Vehicle Inventory
-
----
-
-# 🛠 Tech Stack
-
-## Backend
-
-- Node.js
-- Express.js
-- MongoDB
-- Mongoose
-- JWT Authentication
-- bcrypt
-- Jest
-- Supertest
-
-## Frontend
-
-- React (Vite)
-- Tailwind CSS
-- Axios
-- React Router DOM
 
 ---
 
 # 📂 Project Structure
 
 ```text
-Car-Dealership-System/
-
+CarHub/
 ├── backend/
-│   └── src/
-│       ├── config/
-│       ├── controllers/
-│       ├── middleware/
-│       ├── models/
-│       ├── routes/
-│       ├── services/
-│       ├── tests/
-│       ├── validators/
-│       ├── utils/
-│       ├── app.js
-│       └── server.js
+│   ├── src/
+│   │   ├── config/
+│   │   ├── constants/
+│   │   ├── controllers/
+│   │   ├── middleware/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   ├── services/
+│   │   ├── utils/
+│   │   ├── validators/
+│   │   ├── app.js
+│   │   └── server.js
+│   ├── tests/
+│   │   ├── unit/
+│   │   ├── integration/
+│   │   └── setup.js
+│   ├── .env.example
+│   ├── jest.config.js
+│   ├── package.json
+│   └── package-lock.json
 │
 ├── frontend/
-│   └── src/
-│       ├── api/
-│       ├── components/
-│       ├── context/
-│       ├── hooks/
-│       ├── pages/
-│       ├── routes/
-│       └── main.jsx
+│   ├── src/
+│   │   ├── api/
+│   │   ├── components/
+│   │   ├── context/
+│   │   ├── pages/
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── Login.jsx
+│   │   │   ├── Register.jsx
+│   │   │   └── PurchaseConfirmation.jsx
+│   │   ├── routes/
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── public/
+│   ├── package.json
+│   ├── vite.config.js
+│   └── index.html
 │
 ├── screenshots/
-│   ├── login.png
-│   ├── register.png
-│   ├── user-dashboard.png
-│   ├── admin-dashboard.png
-│   ├── search-vehicle.png
-│   ├── add-vehicle.png
-│   ├── update-vehicle.png
-│   ├── restock-vehicle.png
-│   └── test-report.png
-│
 ├── README.md
 └── PROMPTS.md
 ```
 
 ---
 
-# 🚀 API Endpoints
+# ⚙️ Quick Start & Local Setup
 
-## Authentication
-
-| Method | Endpoint |
-|---------|----------|
-| POST | `/api/auth/register` |
-| POST | `/api/auth/login` |
-
----
-
-## Vehicle Management
-
-| Method | Endpoint |
-|---------|----------|
-| POST | `/api/vehicles` |
-| GET | `/api/vehicles` |
-| GET | `/api/vehicles/search` |
-| PUT | `/api/vehicles/:id` |
-| DELETE | `/api/vehicles/:id` |
-
----
-
-## Inventory Management
-
-| Method | Endpoint |
-|---------|----------|
-| POST | `/api/vehicles/:id/purchase` |
-| POST | `/api/vehicles/:id/restock` |
-
----
-
-# ⚙️ Local Setup
-
-## Clone Repository
-
-```bash
-git clone https://github.com/Sanket-Patoliya/Car-Dealership-System.git
-```
-
----
-
-## Backend Setup
+## 1. Backend Setup
 
 ```bash
 cd backend
 
+# Install dependencies
 npm install
+
+# Configure environment variables
+# Create a .env file (refer to .env.example)
 ```
 
-Create a `.env` file:
-
-```env
-PORT=5000
-
-MONGODB_URI=your_mongodb_connection_string
-
-JWT_SECRET=your_secret_key
-```
-
-Run the backend server:
+Run backend server:
 
 ```bash
+# Development mode
 npm run dev
+
+# Run backend tests
+npm test
 ```
 
----
-
-## Frontend Setup
+## 2. Frontend Setup
 
 ```bash
 cd frontend
 
+# Install dependencies
 npm install
 
+# Start Vite dev server
 npm run dev
 ```
 
 ---
 
-# 🧪 Running Tests
+# 🚀 API Endpoints
 
-Run all backend tests:
+## Base Health Check
 
-```bash
-npm test
-```
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/health` | Health check endpoint | No |
 
-The backend test suite covers:
+## Authentication
 
-- Authentication
-- Authorization
-- Vehicle CRUD Operations
-- Vehicle Search
-- Purchase Functionality
-- Restock Functionality
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/auth/register` | Register a new user | No |
+| POST | `/api/auth/login` | Login user & get JWT | No |
 
----
+## Vehicle Management
 
-# ✅ Test Report
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/vehicles` | List all vehicles | No |
+| GET | `/api/vehicles/search` | Search vehicles with filters | No |
+| POST | `/api/vehicles` | Create a new vehicle | Yes (Admin) |
+| PUT | `/api/vehicles/:id` | Update an existing vehicle | Yes (Admin) |
+| DELETE | `/api/vehicles/:id` | Delete a vehicle | Yes (Admin) |
 
-The backend was developed following the **Red → Green → Refactor** cycle of **Test-Driven Development (TDD)**.
+## Inventory Management
 
-Testing Tools:
-
-- Jest
-- Supertest
-
-### Test Results
-
-![Test Report](./screenshots/test-report.png)
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/vehicles/:id/purchase` | Purchase a vehicle (-1 stock) | Yes (User/Admin) |
+| POST | `/api/vehicles/:id/restock` | Restock vehicle inventory | Yes (Admin) |
 
 ---
 
@@ -262,94 +202,19 @@ Testing Tools:
 
 # 🔐 Admin Access
 
-Every newly registered user is assigned the following role by default:
+Every newly registered user is assigned the default role `USER`.
 
-```text
-user
-```
-
-To access the Admin Dashboard during development:
-
-1. Register a new account.
-2. Open MongoDB Compass.
-3. Change the user's role to:
-
-```json
-{
-  "role": "admin"
-}
-```
-
-4. Log in again to receive a JWT token containing the updated role.
+Default Admin account seeded automatically on startup if connected to MongoDB:
+- **Email**: `admin@gmail.com`
+- **Password**: `admin123`
 
 ---
 
-# 🤖 My AI Usage
+# 🤖 AI Usage & Transparency
 
-AI assistance was used throughout the development process to improve productivity while ensuring that every implementation was manually reviewed and verified.
+AI assistance was used throughout development to maintain high quality and adherence to best practices.
 
-## AI Tool Used
-
-- Antigravity
-
-## How AI Was Used
-
-AI was used to assist with:
-
-- Initial project setup
-- Backend folder structure
-- Express.js configuration
-- MongoDB connection setup
-- REST API design
-- Authentication implementation
-- JWT middleware generation
-- Vehicle CRUD implementation
-- Search and filtering logic
-- Purchase and restock functionality
-- Jest & Supertest test generation
-- React component scaffolding
-- Debugging support
-- Refactoring suggestions
-- Documentation generation
-
-## Development Process
-
-Every AI-generated response was:
-
-- Reviewed manually
-- Modified where required
-- Tested before committing
-- Verified against project requirements
-
-The complete AI prompt history used during development is available in:
-
-```text
-PROMPTS.md
-```
-
----
-
-# 📌 Git Workflow
-
-The project was developed using **small, frequent commits** while following the **Red → Green → Refactor** workflow.
-
-Example:
-
-```text
-test: add registration tests
-
-feat: implement user registration
-
-refactor: extract auth service
-
-test: add vehicle creation tests
-
-feat: implement vehicle creation
-
-refactor: improve vehicle service
-```
-
-AI-assisted commits include a co-author trailer to maintain transparency as required by the project guidelines.
+The complete AI prompt history is preserved in [PROMPTS.md](file:///c:/Users/visaveliya%20yagnik/Desktop/Sanket/Car-Dealership-System/PROMPTS.md).
 
 ---
 

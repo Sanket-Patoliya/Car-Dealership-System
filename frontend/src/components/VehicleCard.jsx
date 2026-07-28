@@ -1,25 +1,13 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import api from '../api/axios';
 
-const VehicleCard = ({ vehicle, onEdit, onRestock, onDelete, onPurchaseSuccess }) => {
+const VehicleCard = ({ vehicle, onEdit, onRestock, onDelete }) => {
   const { user } = useContext(AuthContext);
-  const [purchasing, setPurchasing] = useState(false);
-  const [purchaseError, setPurchaseError] = useState('');
+  const navigate = useNavigate();
 
-  const handlePurchase = async () => {
-    setPurchasing(true);
-    setPurchaseError('');
-    try {
-      const res = await api.post(`/vehicles/${vehicle.id}/purchase`);
-      if (res.data.status === 'success') {
-        onPurchaseSuccess(res.data.data.vehicle);
-      }
-    } catch (err) {
-      setPurchaseError(err.response?.data?.message || 'Purchase failed');
-    } finally {
-      setPurchasing(false);
-    }
+  const handlePurchase = () => {
+    navigate(`/purchase/${vehicle.id}`, { state: { vehicle } });
   };
 
   const isAdmin = user?.role === 'ADMIN';
@@ -52,10 +40,6 @@ const VehicleCard = ({ vehicle, onEdit, onRestock, onDelete, onPurchaseSuccess }
         <div className="mt-2 text-2xl font-extrabold text-slate-900">
           ${vehicle.price.toLocaleString()}
         </div>
-
-        {purchaseError && (
-          <p className="mt-2 text-xs text-rose-600 font-medium">{purchaseError}</p>
-        )}
       </div>
 
       {/* Action Buttons */}
@@ -84,10 +68,10 @@ const VehicleCard = ({ vehicle, onEdit, onRestock, onDelete, onPurchaseSuccess }
         ) : (
           <button
             onClick={handlePurchase}
-            disabled={vehicle.quantity <= 0 || purchasing}
+            disabled={vehicle.quantity <= 0}
             className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-100 disabled:text-slate-400 text-white font-semibold py-2.5 px-4 rounded-xl transition-all duration-300 shadow-sm shadow-indigo-600/10 disabled:shadow-none text-sm animate-in fade-in duration-300"
           >
-            {purchasing ? 'Purchasing...' : vehicle.quantity <= 0 ? 'Out of Stock' : 'Purchase'}
+            {vehicle.quantity <= 0 ? 'Out of Stock' : 'Purchase'}
           </button>
         )}
       </div>
